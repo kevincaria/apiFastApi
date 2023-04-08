@@ -28,16 +28,62 @@ async def users():
     return usersList
 
 #Por path http://127.0.0.1:8000/userpath/1
-@app.get('/userpath/{id}')
+@app.get('/user/{id}')
 async def user(id:int):
-    return search_user(id)
+    return searchUser(id)
     
 #Por query http://127.0.0.1:8000/userquery?id=2
 @app.get('/userquery')
 async def user(id:int):
-    return search_user(id)
+    return searchUser(id)
     
-def search_user(id: int):
+@app.post('/user/')
+async def user(user: User):
+    response = ' '
+    if(type(searchUser(user.id)) == User):
+        response =  {'Error': 'El usuario ya existe'}
+    else:
+        usersList.append(user)
+        response =  'El usuario se cargo exitosamente'
+
+    return response
+
+@app.put('/user/')
+async def user(user: User):
+
+    found = False
+    response = ' '
+
+    #Solo por probar otra forma de buscar el usuario, podria seguir usando searchUser
+    for index, savedUser in enumerate(usersList):
+        if savedUser.id == user.id:
+            usersList[index] = user
+            found = True
+            response = 'Usuario actualizado correctamente'
+        
+    if found is False:
+        response = {'Error': 'No se ha encontrado el usuario'}
+    
+    return response
+
+@app.delete('/user/{id}')
+async def user(id:int):
+    found = False
+    response = ' '
+
+    #Solo por probar otra forma de buscar el usuario, podria seguir usando searchUser
+    for index, savedUser in enumerate(usersList):
+        if savedUser.id == user.id:
+            del usersList[index] 
+            found = True
+            response = 'Usuario eliminado correctamente'
+        
+    if found is False:
+        response = {'Error': 'No se ha eliminado el usuario'}
+    
+    return response
+
+def searchUser(id: int):
     users = filter(lambda user: user.id == id, usersList)
     try:
         return list(users)[0]
