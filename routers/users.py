@@ -1,9 +1,12 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+
 # Documentación con Swagger http://127.0.0.1:8000/docs
 # Documentación con Redocly http://127.0.0.1:8000/redoc
-# uvicorn users:app --reload para arrancar la app y ctrl + c para detenerla
-app = FastAPI()
+
+router = APIRouter(prefix='/users', 
+                   tags = ['users'], 
+                   responses={404: {'message':'No encontrado'}})
 
 # Entidad Users
 class User(BaseModel):
@@ -17,36 +20,30 @@ usersList = [User(id= 1,  name='Kevin', surname='Caria', url='https=//kevin.com'
             User(id= 2,  name='Gaspar', surname='Caria', url='https=//gaspar.com', age=70),
             User(id= 3,  name='Hidalgo', surname='Caria', url='https=//hidalgo.com', age=85)]
 
-@app.get('/usersjson')
-async def users():
-    return [{'name':'Kevin', 'surname':'Caria', 'url':'https://kevin.com', 'age':29},
-            {'name':'Gaspar', 'surname':'Caria', 'url':'https://gaspar.com', 'age':70},
-            {'name':'Hidalgo', 'surname':'Caria', 'url':'https://hidalgo.com', 'age':85}]
-
-@app.get('/users',  status_code=200)
+@router.get('/',  status_code=200)
 async def users():
     return usersList
 
 #Por path http://127.0.0.1:8000/userpath/1
-@app.get('/user/{id}',  status_code=200)
+@router.get('/{id}',  status_code=200)
 async def user(id:int):
     return searchUser(id)
     
-#Por query http://127.0.0.1:8000/userquery?id=2
-@app.get('/userquery',  status_code=200)
-async def user(id:int):
-    return searchUser(id)
+# Por query http://127.0.0.1:8000/userquery?id=2
+# @router.get('/',  status_code=200)
+# async def user(id:int):
+#     return searchUser(id)
     
-@app.post('/user/', response_model=User, status_code=201)
+@router.post('/', response_model=User, status_code=201)
 async def user(user: User):
     response = ' '
     if(type(searchUser(user.id)) == User):
         raise HTTPException(status_code=204, detail= 'El usuario ya existe')
     else:
-        usersList.append(user)
+        usersList.routerend(user)
 
 
-@app.put('/user/', status_code=200)
+@router.put('/', status_code=200)
 async def user(user: User):
 
     found = False
@@ -62,7 +59,7 @@ async def user(user: User):
         raise HTTPException(status_code=404, detail= 'No se ha encontrado el usuario')
     
 
-@app.delete('/user/{id}', status_code=200)
+@router.delete('/{id}', status_code=200)
 async def user(id:int):
     found = False
     response = ' '
