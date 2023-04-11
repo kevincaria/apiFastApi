@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 # Documentación con Swagger http://127.0.0.1:8000/docs
 # Documentación con Redocly http://127.0.0.1:8000/redoc
@@ -23,32 +23,30 @@ async def users():
             {'name':'Gaspar', 'surname':'Caria', 'url':'https://gaspar.com', 'age':70},
             {'name':'Hidalgo', 'surname':'Caria', 'url':'https://hidalgo.com', 'age':85}]
 
-@app.get('/users')
+@app.get('/users',  status_code=200)
 async def users():
     return usersList
 
 #Por path http://127.0.0.1:8000/userpath/1
-@app.get('/user/{id}')
+@app.get('/user/{id}',  status_code=200)
 async def user(id:int):
     return searchUser(id)
     
 #Por query http://127.0.0.1:8000/userquery?id=2
-@app.get('/userquery')
+@app.get('/userquery',  status_code=200)
 async def user(id:int):
     return searchUser(id)
     
-@app.post('/user/')
+@app.post('/user/', response_model=User, status_code=201)
 async def user(user: User):
     response = ' '
     if(type(searchUser(user.id)) == User):
-        response =  {'Error': 'El usuario ya existe'}
+        raise HTTPException(status_code=204, detail= 'El usuario ya existe')
     else:
         usersList.append(user)
-        response =  'El usuario se cargo exitosamente'
 
-    return response
 
-@app.put('/user/')
+@app.put('/user/', status_code=200)
 async def user(user: User):
 
     found = False
@@ -59,14 +57,12 @@ async def user(user: User):
         if savedUser.id == user.id:
             usersList[index] = user
             found = True
-            response = 'Usuario actualizado correctamente'
         
     if found is False:
-        response = {'Error': 'No se ha encontrado el usuario'}
+        raise HTTPException(status_code=404, detail= 'No se ha encontrado el usuario')
     
-    return response
 
-@app.delete('/user/{id}')
+@app.delete('/user/{id}', status_code=200)
 async def user(id:int):
     found = False
     response = ' '
@@ -76,10 +72,9 @@ async def user(id:int):
         if savedUser.id == user.id:
             del usersList[index] 
             found = True
-            response = 'Usuario eliminado correctamente'
         
     if found is False:
-        response = {'Error': 'No se ha eliminado el usuario'}
+        raise HTTPException(status_code=400, detail=  'No se ha eliminado el usuario')
     
     return response
 
@@ -88,4 +83,4 @@ def searchUser(id: int):
     try:
         return list(users)[0]
     except:
-        return {'Error': 'No se ha encontrado el usuario'}
+        raise HTTPException(status_code=400, detail= 'El usuario ya existe')
