@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-# Documentación con Swagger http://127.0.0.1:8000/docs
-# Documentación con Redocly http://127.0.0.1:8000/redoc
+
 
 router = APIRouter(prefix='/users', 
                    tags = ['users'], 
