@@ -1,23 +1,14 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-
-
+from fastapi import APIRouter, HTTPException, status
+from db.models.user import User
+from db.schemas.user import user_schema
+from db.client import db_client
 
 router = APIRouter(prefix='/users', 
                    tags = ['users'], 
-                   responses={404: {'message':'No encontrado'}})
+                   responses={status.HTTP_404_NOT_FOUND: {'message':'No encontrado'}})
 
-# Entidad Users
-class User(BaseModel):
-    id: int
-    name: str
-    surname: str
-    url: str
-    age: int
 
-usersList = [User(id= 1,  name='Kevin', surname='Caria', url='https=//kevin.com', age=29),
-            User(id= 2,  name='Gaspar', surname='Caria', url='https=//gaspar.com', age=70),
-            User(id= 3,  name='Hidalgo', surname='Caria', url='https=//hidalgo.com', age=85)]
+usersList = []
 
 @router.get('/',  status_code=200)
 async def users():
@@ -33,14 +24,19 @@ async def user(id:int):
 # async def user(id:int):
 #     return searchUser(id)
     
-@router.post('/', response_model=User, status_code=201)
+@router.post('/', response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: User):
-    response = ' '
-    if(type(searchUser(user.id)) == User):
-        raise HTTPException(status_code=204, detail= 'El usuario ya existe')
-    else:
-        usersList.routerend(user)
+    # if(type(searchUser(user.id)) == User):
+    #     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail= 'El usuario ya existe')
+    # else:
+    user_dict = dict(user)
+    del user_dict["id"]
 
+    id = db_client.local.users.insert_one(user_dict).inserted_id
+
+    new_user = user_schema(db_client.local.users.find_one({"_id":id}))
+
+    return User(**new_user)
 
 @router.put('/', status_code=200)
 async def user(user: User):

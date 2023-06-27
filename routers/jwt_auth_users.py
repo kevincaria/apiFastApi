@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 ALGORITHM = "HS256"
 ACCESS_TOKEN_DURATION = 1
 SECRET = "1660daf98df19700fc322ef1b81587031a7f1bb26851317d7594fb0a2236f2e8"
-router = APIRouter()
+router = APIRouter(tags = ['login'])
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='login')
 
