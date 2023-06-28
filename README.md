@@ -18,5 +18,5 @@ Esta es una API de usuarios que permite realizar operaciones CRUD sobre usuarios
 ## Requisitos no funcionales
 
 - **Seguridad**: La API garantiza la seguridad de los datos y la autenticación de usuarios mediante el uso de JWT y Oauth2.
-- **Documentación**: La API debe estar documentada utilizando Swagger (http://127.0.0.1:8000/docs) y Redocly (http://127.0.0.1:8000/redoc)
+- **Documentación**: La API esta documentada en Swagger (http://127.0.0.1:8000/docs) y Redocly (http://127.0.0.1:8000/redoc)
 - **Pruebas unitarias**: Se deben desarrollar pruebas unitarias para garantizar la funcionalidad correcta de los endpoints y los casos de uso principales.
